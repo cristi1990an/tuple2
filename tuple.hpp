@@ -127,6 +127,7 @@ namespace std2
 			constexpr decltype(auto) get_() & noexcept
 			{
 				return static_cast<std::remove_reference_t<T>&>(value_);
+				}
 			}
 
 			constexpr decltype(auto) get_() const& noexcept
@@ -154,8 +155,8 @@ namespace std2
 				}
 				else
 				{
-					return std::move(value_);
-				}
+				return std::move(value_);
+			}
 			}
 
 			T value_;
@@ -436,13 +437,27 @@ namespace std2
 		template<std::size_t I>
 		constexpr decltype(auto) get_() const& noexcept
 		{
-			return get_entry_<I>().get_wrapper_().get_();
+			if constexpr (std::is_rvalue_reference_v<std::tuple_element_t<I, tuple>>)
+			{
+				return std::move(*this).template get_entry_<I>().get_wrapper_().get_();
+			}
+			else
+			{
+				return get_entry_<I>().get_wrapper_().get_();
+			}
 		}
 
 		template<std::size_t I>
 		constexpr decltype(auto) get_() & noexcept
 		{
-			return get_entry_<I>().get_wrapper_().get_();
+			if constexpr (std::is_rvalue_reference_v<std::tuple_element_t<I, tuple>>)
+			{
+				return std::move(*this).template get_entry_<I>().get_wrapper_().get_();
+			}
+			else
+			{
+				return get_entry_<I>().get_wrapper_().get_();
+			}
 		}
 
 		template<std::size_t I>

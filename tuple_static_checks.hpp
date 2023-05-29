@@ -121,6 +121,11 @@ namespace tuple_static_checks
 		static_assert(std::same_as<expected_t<T, T&&, true>, rvalue_tuple_get_result>);
 		static_assert(std::same_as<expected_t<T, const T&&, true>, const_rvalue_tuple_get_result>);
 
+		static_assert(std::same_as<lvalue_expected_t, lvalue_tuple_get_result>);
+		//static_assert(std::same_as<const lvalue_expected_t, const_lvalue_tuple_get_result>);
+		//static_assert(std::same_as<T&&, rvalue_tuple_get_result>);
+		//static_assert(std::same_as<const T&&, const_rvalue_tuple_get_result>);
+
 		return true;
 	}
 
