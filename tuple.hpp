@@ -437,12 +437,20 @@ namespace std2
 		constexpr decltype(auto) get_() const& noexcept
 		{
 			return get_entry_<I>().get_wrapper_().get_();
-		}
-
-		template<std::size_t I>
-		constexpr decltype(auto) get_() & noexcept
-		{
+			}
+=========
 			return get_entry_<I>().get_wrapper_().get_();
+>>>>>>>>> Temporary merge branch 2
+		}
+			return get_entry_<I>().get_wrapper_().get_();
+			}
+			else
+			{
+				return get_entry_<I>().get_wrapper_().get_();
+			}
+=========
+			return get_entry_<I>().get_wrapper_().get_();
+>>>>>>>>> Temporary merge branch 2
 		}
 
 		template<std::size_t I>
