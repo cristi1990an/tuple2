@@ -154,8 +154,8 @@ namespace std2
 				}
 				else
 				{
-					return std::move(value_);
-				}
+				return std::move(value_);
+			}
 			}
 
 			T value_;
