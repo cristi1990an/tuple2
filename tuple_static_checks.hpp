@@ -18,7 +18,7 @@ namespace tuple_static_checks
 		constexpr ~non_trivial() {}
 	};
 
-	using trivial_tuple = std2::tuple<int, float, char>;
+	using trivial_tuple = TUPLE_NAMESPACE::tuple<int, float, char>;
 
 	static_assert(std::is_trivial_v<trivial_tuple>);
 	static_assert(std::is_trivially_assignable_v<trivial_tuple, trivial_tuple>);
@@ -42,13 +42,13 @@ namespace tuple_static_checks
 	struct empty_struct{};
 
 	static constexpr auto int_size = sizeof(int);
-	static constexpr auto tuple_int_size = sizeof(std2::tuple<int>);
-	static constexpr auto tuple_empty_size = sizeof(std2::tuple<empty_struct>);
-	static constexpr auto tuple_empty_empty_size = sizeof(std2::tuple<empty_struct, empty_struct>);
-	static constexpr auto tuple_int_empty_size = sizeof(std2::tuple<int, empty_struct>);
-	static constexpr auto tuple_empty_int_size = sizeof(std2::tuple<empty_struct, int>);
-	static constexpr auto tuple_int_empty_int_size = sizeof(std2::tuple<int, empty_struct, int>);
-	static constexpr auto tuple_empty_int_empty_size = sizeof(std2::tuple<empty_struct, int, empty_struct>);
+	static constexpr auto tuple_int_size = sizeof(TUPLE_NAMESPACE::tuple<int>);
+	static constexpr auto tuple_empty_size = sizeof(TUPLE_NAMESPACE::tuple<empty_struct>);
+	static constexpr auto tuple_empty_empty_size = sizeof(TUPLE_NAMESPACE::tuple<empty_struct, empty_struct>);
+	static constexpr auto tuple_int_empty_size = sizeof(TUPLE_NAMESPACE::tuple<int, empty_struct>);
+	static constexpr auto tuple_empty_int_size = sizeof(TUPLE_NAMESPACE::tuple<empty_struct, int>);
+	static constexpr auto tuple_int_empty_int_size = sizeof(TUPLE_NAMESPACE::tuple<int, empty_struct, int>);
+	static constexpr auto tuple_empty_int_empty_size = sizeof(TUPLE_NAMESPACE::tuple<empty_struct, int, empty_struct>);
 
 	static_assert(int_size == tuple_int_size);
 	static_assert(int_size == tuple_int_empty_size);
@@ -61,11 +61,11 @@ namespace tuple_static_checks
 	template<typename T1, typename T2, typename T3>
 	constexpr bool tuple_element_type_test() noexcept
 	{
-		using my_tup = std2::tuple<T1, T2, T3>;
-		using my_lvalue_tup = std2::tuple<T1&, T2&, T3&>;
-		using my_const_lvalue_tup = std2::tuple<const T1&, const T2&, const T3&>;
-		using my_rvalue_tup = std2::tuple<T1&&, T2&&, T3&&>;
-		using my_const_rvalue_tup = std2::tuple<const T1&&, const T2&&, const T3&&>;
+		using my_tup = TUPLE_NAMESPACE::tuple<T1, T2, T3>;
+		using my_lvalue_tup = TUPLE_NAMESPACE::tuple<T1&, T2&, T3&>;
+		using my_const_lvalue_tup = TUPLE_NAMESPACE::tuple<const T1&, const T2&, const T3&>;
+		using my_rvalue_tup = TUPLE_NAMESPACE::tuple<T1&&, T2&&, T3&&>;
+		using my_const_rvalue_tup = TUPLE_NAMESPACE::tuple<const T1&&, const T2&&, const T3&&>;
 
 		static_assert(std::same_as<T1, std::tuple_element_t<0, my_tup>>);
 		static_assert(std::same_as<T2, std::tuple_element_t<1, my_tup>>);
@@ -106,10 +106,10 @@ namespace tuple_static_checks
 	template<typename T>
 	constexpr bool get_tests() noexcept
 	{
-		using lvalue_tuple = std2::tuple<T>&;
-		using const_lvalue_tuple = const std2::tuple<T>&;
-		using rvalue_tuple = std2::tuple<T>&&;
-		using const_rvalue_tuple = const std2::tuple<T>&&;
+		using lvalue_tuple = TUPLE_NAMESPACE::tuple<T>&;
+		using const_lvalue_tuple = const TUPLE_NAMESPACE::tuple<T>&;
+		using rvalue_tuple = TUPLE_NAMESPACE::tuple<T>&&;
+		using const_rvalue_tuple = const TUPLE_NAMESPACE::tuple<T>&&;
 
 		using lvalue_tuple_get_result = decltype(std::get<0>(std::declval<lvalue_tuple>()));
 		using const_lvalue_tuple_get_result = decltype(std::get<0>(std::declval<const_lvalue_tuple>()));
@@ -139,8 +139,8 @@ namespace tuple_static_checks
 	static_assert(full_get_tests<non_trivial>());
 
 	static_assert(std::same_as<
-		std2::tuple<int, float, char>,
-		decltype(std2::tuple{
+		TUPLE_NAMESPACE::tuple<int, float, char>,
+		decltype(TUPLE_NAMESPACE::tuple{
 			std::declval<int>(),
 			std::declval<float>(),
 			std::declval<char>()
@@ -148,8 +148,8 @@ namespace tuple_static_checks
 	> );
 
 	static_assert(std::same_as<
-		std2::tuple<int, float, char>,
-		decltype(std2::tuple{
+		TUPLE_NAMESPACE::tuple<int, float, char>,
+		decltype(TUPLE_NAMESPACE::tuple{
 			std::declval<const int>(),
 			std::declval<const float>(),
 			std::declval<const char>()
@@ -157,8 +157,8 @@ namespace tuple_static_checks
 	> );
 
 	static_assert(std::same_as <
-		std2::tuple<int, float, char>,
-		decltype(std2::tuple{
+		TUPLE_NAMESPACE::tuple<int, float, char>,
+		decltype(TUPLE_NAMESPACE::tuple{
 			std::declval<int&>(),
 			std::declval<float&>(),
 			std::declval<char&>()
@@ -166,11 +166,48 @@ namespace tuple_static_checks
 	> );
 
 	static_assert(std::same_as <
-		std2::tuple<int, float, char>,
-		decltype(std2::tuple{
+		TUPLE_NAMESPACE::tuple<int, float, char>,
+		decltype(TUPLE_NAMESPACE::tuple{
 			std::declval<int&&>(),
 			std::declval<float&&>(),
 			std::declval<char&&>()
 			})
+	> );
+
+	///////////////////////////
+	static_assert(std::same_as <
+		TUPLE_NAMESPACE::tuple<int&&, float&&, char&&>,
+		decltype(TUPLE_NAMESPACE::forward_as_tuple(
+			std::declval<int>(),
+			std::declval<float>(),
+			std::declval<char>()
+			))
+	> );
+
+	static_assert(std::same_as <
+		TUPLE_NAMESPACE::tuple<const int&&, const float&&, const char&&>,
+		decltype(TUPLE_NAMESPACE::forward_as_tuple(
+			std::declval<const int>(),
+			std::declval<const float>(),
+			std::declval<const char>()
+			))
+	> );
+
+	static_assert(std::same_as <
+		TUPLE_NAMESPACE::tuple<int&, float&, char&>,
+		decltype(TUPLE_NAMESPACE::forward_as_tuple(
+			std::declval<int&>(),
+			std::declval<float&>(),
+			std::declval<char&>()
+			))
+	> );
+
+	static_assert(std::same_as <
+		TUPLE_NAMESPACE::tuple<int&&, float&&, char&&>,
+		decltype(TUPLE_NAMESPACE::forward_as_tuple(
+			std::declval<int&&>(),
+			std::declval<float&&>(),
+			std::declval<char&&>()
+			))
 	> );
 }

@@ -21,6 +21,6 @@
 
 int main()
 {
-	
+	std2::tuple tup{ 1, 2, 3 };
 }
 

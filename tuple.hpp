@@ -4,7 +4,9 @@
 #include <concepts>
 #include <tuple>
 
-namespace std2
+#define TUPLE_NAMESPACE std2
+
+namespace TUPLE_NAMESPACE
 {
 	template<typename ... Args>
 	class tuple;
@@ -13,23 +15,23 @@ namespace std2
 namespace std
 {
 	template<typename ... Types>
-	struct tuple_size<std2::tuple<Types...>>
+	struct tuple_size<TUPLE_NAMESPACE::tuple<Types...>>
 		: std::integral_constant<std::size_t, sizeof...(Types)> { };
 
 	template<std::size_t I, typename T>
 	struct tuple_element;
 
 	template<std::size_t I, typename Head, typename... Tail>
-	struct tuple_element<I, std2::tuple<Head, Tail...>>
-		: std::tuple_element<I - 1, std2::tuple<Tail...>> { };
+	struct tuple_element<I, TUPLE_NAMESPACE::tuple<Head, Tail...>>
+		: std::tuple_element<I - 1, TUPLE_NAMESPACE::tuple<Tail...>> { };
 
 	template<typename Head, typename... Tail>
-	struct tuple_element<0, std2::tuple<Head, Tail...>> {
+	struct tuple_element<0, TUPLE_NAMESPACE::tuple<Head, Tail...>> {
 		using type = Head;
 	};
 }
 
-namespace std2
+namespace TUPLE_NAMESPACE
 {
 	namespace detail
 	{
@@ -283,11 +285,11 @@ namespace std2
 
 namespace std
 {
-	template<std::size_t I, std2::detail::tuple_spec Tuple>
+	template<std::size_t I, TUPLE_NAMESPACE::detail::tuple_spec Tuple>
 	constexpr decltype(auto) get(Tuple&& t) noexcept;
 }
 
-namespace std2
+namespace TUPLE_NAMESPACE
 {
 	template <typename ... Args>
 	class tuple : public detail::tuple_entry_<0, Args...>
@@ -461,41 +463,41 @@ namespace std2
 			return std::move(*this).template get_entry_<I>().get_wrapper_().get_();
 		}
 
-		template<std::size_t I, std2::detail::tuple_spec Tuple>
+		template<std::size_t I, TUPLE_NAMESPACE::detail::tuple_spec Tuple>
 		friend constexpr decltype(auto) std::get(Tuple&& t) noexcept;
 	};
 
 	template <typename ... Types>
-	constexpr std2::tuple<std::unwrap_ref_decay_t<Types>...>
+	constexpr TUPLE_NAMESPACE::tuple<std::unwrap_ref_decay_t<Types>...>
 		make_tuple(Types&& ... args) 
 	noexcept ((std::is_nothrow_constructible_v<std::unwrap_ref_decay_t<Types>, Types&&> && ...))
 	{
-		std2::tuple<std::unwrap_ref_decay_t<Types>...>(
+		return TUPLE_NAMESPACE::tuple<std::unwrap_ref_decay_t<Types>...>(
 			std::forward<Types>(args)...);
 	}
 
 	template <typename ... Types>
-	constexpr std2::tuple<Types&...> tie(Types& ... args) noexcept
+	constexpr TUPLE_NAMESPACE::tuple<Types&...> tie(Types& ... args) noexcept
 	{
 		return { args... };
 	}
 
 	template <typename ... Types>
-	constexpr std2::tuple<Types&& ...> forward_as_tuple(Types&&... args) noexcept
+	constexpr TUPLE_NAMESPACE::tuple<Types&& ...> forward_as_tuple(Types&&... args) noexcept
 	{
 		return { args... };
 	}
 
 	template <typename ... Types>
-	std2::tuple(Types...)->std2::tuple<Types...>;
+	TUPLE_NAMESPACE::tuple(Types...)->TUPLE_NAMESPACE::tuple<Types...>;
 
 	template <typename T, typename U>
-	std2::tuple(std::pair<T, U>)->tuple<T, U>;
+	TUPLE_NAMESPACE::tuple(std::pair<T, U>)->tuple<T, U>;
 }
 
 namespace std
 {
-	template<std::size_t I, std2::detail::tuple_spec Tuple>
+	template<std::size_t I, TUPLE_NAMESPACE::detail::tuple_spec Tuple>
 	constexpr decltype(auto) get(Tuple&& t) noexcept
 	{
 		return std::forward<Tuple>(t).template get_<I>();
@@ -503,8 +505,8 @@ namespace std
 
 	template <typename ... Types>
 		requires (std::is_swappable_v<Types> && ...)
-	constexpr void swap(std2::tuple<Types...>& lhs,
-		                std2::tuple<Types...>& rhs)
+	constexpr void swap(TUPLE_NAMESPACE::tuple<Types...>& lhs,
+		                TUPLE_NAMESPACE::tuple<Types...>& rhs)
 		noexcept ((std::is_nothrow_swappable_v<Types> && ...))
 	{
 		lhs.swap(rhs);
@@ -512,8 +514,8 @@ namespace std
 
 	template <typename ... Types>
 		requires (std::is_swappable_v<const Types> && ...)
-	constexpr void swap(const std2::tuple<Types...>& lhs,
-		                const std2::tuple<Types...>& rhs)
+	constexpr void swap(const TUPLE_NAMESPACE::tuple<Types...>& lhs,
+		                const TUPLE_NAMESPACE::tuple<Types...>& rhs)
 		noexcept ((std::is_nothrow_swappable_v<const Types> && ...))
 	{
 		lhs.swap(rhs);
@@ -521,16 +523,16 @@ namespace std
 }
 
 template <typename ... Types, typename Alloc>
-struct std::uses_allocator<std2::tuple<Types...>, Alloc> : std::true_type {};
+struct std::uses_allocator<TUPLE_NAMESPACE::tuple<Types...>, Alloc> : std::true_type {};
 
-namespace std2::detail
+namespace TUPLE_NAMESPACE::detail
 {
 	template<std::size_t I, std::size_t MaxIndex>
 	constexpr auto recursive_compare(const auto& lhs, const auto& rhs) noexcept
 	{
 		if constexpr (I < MaxIndex - 1)
 		{
-			const auto result = std2::detail::synth_three_way(
+			const auto result = TUPLE_NAMESPACE::detail::synth_three_way(
 				std::get<I>(lhs),
 				std::get<I>(rhs));
 			return result != 0 ? result
@@ -538,7 +540,7 @@ namespace std2::detail
 		}
 		else
 		{
-			return std2::detail::synth_three_way(
+			return TUPLE_NAMESPACE::detail::synth_three_way(
 				std::get<I>(lhs),
 				std::get<I>(rhs));
 		}
@@ -547,9 +549,9 @@ namespace std2::detail
 
 template <typename ... TTypes, typename ... UTypes>
 constexpr std::common_comparison_category_t<
-	std2::detail::synth_three_way_result<TTypes, UTypes>...>
-	operator<=>(const std2::tuple<TTypes...>& lhs,
-		const std2::tuple<UTypes...>& rhs) noexcept
+	TUPLE_NAMESPACE::detail::synth_three_way_result<TTypes, UTypes>...>
+	operator<=>(const TUPLE_NAMESPACE::tuple<TTypes...>& lhs,
+		const TUPLE_NAMESPACE::tuple<UTypes...>& rhs) noexcept
 {
 	if constexpr (sizeof...(TTypes) == 0)
 	{
@@ -557,6 +559,6 @@ constexpr std::common_comparison_category_t<
 	}
 	else
 	{
-		return std2::detail::recursive_compare<0, sizeof...(TTypes)>(lhs, rhs);
+		return TUPLE_NAMESPACE::detail::recursive_compare<0, sizeof...(TTypes)>(lhs, rhs);
 	}
 }
