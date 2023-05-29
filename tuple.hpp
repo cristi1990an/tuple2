@@ -117,12 +117,16 @@ namespace std2
 		struct value_wrapper_<T, I>
 		{
 			constexpr value_wrapper_() noexcept = default;
-			constexpr value_wrapper_(auto&& value) noexcept
-				: value_(std::forward<decltype(value)>(value)) {}
+			template <typename U>
+			requires std::constructible_from<T, U>
+			constexpr value_wrapper_(U&& value) noexcept
+				: value_(std::forward<U>(value)) {}
 
 			constexpr value_wrapper_(std::allocator_arg_t, const auto&) noexcept {}
-			constexpr value_wrapper_(std::allocator_arg_t, const auto&, auto&& value) noexcept
-				: value_(std::forward<decltype(value)>(value)) {}
+			template <typename U>
+			requires std::constructible_from<T, U>
+			constexpr value_wrapper_(std::allocator_arg_t, const auto&, U&& value) noexcept
+				: value_(std::forward<U>(value)) {}
 
 			constexpr decltype(auto) get_() & noexcept
 			{
@@ -240,7 +244,7 @@ namespace std2
 		template<typename T>
 		concept boolean_testable = requires (T t)
 		{
-			[](bool){}(t);
+			[](bool){/**/}(t);
 		};
 
 		static constexpr auto synth_three_way =
